@@ -178,33 +178,8 @@ try:
             # Press download
             final_download_button.click()
 
-            time.sleep(5) # Wait for the download to complete            
-
-            '''
-            # Robust captcha 
-
-            # while final_download_button!=None:
-            #     # Handle CAPTCHA
-            #     captcha_element = WebDriverWait(driver, 10).until(
-            #         EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[4]/div/div/div/img"))
-            #     )
-            #     captcha_solution = solve_captcha(captcha_element).upper()
-
-            #     # Fill in the CAPTCHA solution
-            #     captcha_input = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[4]/div/div/input")
-            #     captcha_input.clear()
-            #     captcha_input.send_keys(captcha_solution)
-
-            #     # Press download
-            #     final_download_button.click()
-
-            #     time.sleep(5) # Wait for the download to complete
-
-            #     # Retrieve download button status 
-            #     final_download_button = WebDriverWait(driver, 10).until(
-            #       EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[6]/button"))
-            #     )
-            '''
+            # Wait for the download to complete     
+            time.sleep(5)           
 
             # Log the successful download
             logging.info(f"Successfully downloaded dataset {dataset_number}")
