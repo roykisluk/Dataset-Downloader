@@ -19,6 +19,9 @@ from PIL import Image
 ### CRITICAL ###
 ####################################################################################################
 
+# Install the required packages
+# pip install requests selenium transformers torch pillow
+
 # Initialize WebDriver: download the appropriate ChromeDriver for your OS from: https://googlechromelabs.github.io/chrome-for-testing/#stable
 driver_path = '/Users/roykisluk/Downloads/Archive/chromedriver-mac-arm64/chromedriver'  # Replace with your ChromeDriver path
 
