@@ -30,9 +30,16 @@ driver_path = '/Users/roykisluk/Downloads/Archive/chromedriver-mac-arm64/chromed
 ####################################################################################################
 
 # 2Captcha API key
-api_key = "dacf9aa71002cf5b72172508ac481ef0"  # Optional: replace with your 2Captcha API key
+'''
+# Set API key from environment variable
+api_key = os.getenv("TWOCAPTCHA_API_KEY")
+if not api_key:
+    raise ValueError("2Captcha API key not found in environment variables. Please set 'TWOCAPTCHA_API_KEY'.")
+# First time: set the 2Captcha API key in the system environment variables:  
+# os.environ["TWOCAPTCHA_API_KEY"] = ""
+'''
 
-# Target URL, page 1
+# Target URL, first page
 link = "https://www.data.gov.in/catalog/6th-minor-irrigation-census-village-schedule-ground-water-schemes-surface-water-schemes"
 
 # Structure info
