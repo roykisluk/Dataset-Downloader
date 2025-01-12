@@ -114,10 +114,6 @@ try:
             )
             dataset_info = dataset_element.text
             dataset_link = dataset_element.get_attribute('href')
-            
-            # Log dataset details to CSV
-            with open('dataset_details.csv', 'a') as file:
-                file.write(f"{dataset_number},{page},{i},{dataset_info},{dataset_link}\n")
 
             # Click on the download button
             download_button = WebDriverWait(driver, 10).until(
@@ -158,9 +154,18 @@ try:
             captcha_input = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[4]/div/div/input")
             # captcha_input.clear()
             captcha_input.send_keys(captcha_solution)
-
+                    
             # Press download
             final_download_button.click()
+
+            with open('dataset_details.csv', 'r') as file:
+                if not any(line.startswith(f"{dataset_number},") for line in file):
+                    # Get URL of newly opened tab
+                    driver.switch_to.window(driver.window_handles[-1])
+                    download_url = driver.current_url
+                    # Update the dataset details CSV with the download URL and other details
+                    with open('dataset_details.csv', 'a') as file:
+                        file.write(f"{dataset_number},{page},{i},{dataset_info},{dataset_link},{download_url}\n")
 
             # Wait for the download to complete     
             time.sleep(5)           
