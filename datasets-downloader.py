@@ -31,7 +31,7 @@ driver_path = '/Users/roykisluk/Downloads/Archive/chromedriver-mac-arm64/chromed
 ####################################################################################################
 
 # Define the download folder path
-download_folder = os.path.abspath("/Volumes/SSD")
+download_folder = os.path.abspath("/Users/roykisluk/Downloads/Datasets/")
 
 # Target URL, first page
 link = "https://www.data.gov.in/catalog/6th-minor-irrigation-census-village-schedule-ground-water-schemes-surface-water-schemes"
@@ -154,18 +154,23 @@ try:
             captcha_input = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[4]/div/div/input")
             # captcha_input.clear()
             captcha_input.send_keys(captcha_solution)
-                    
+
+            # Set the download path to dataset number subfolder
+            driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+            params = {'cmd': 'Page.setDownloadBehavior',
+                      'params': {'behavior': 'allow', 'downloadPath': os.path.join(download_folder, str(dataset_number))}}
+            driver.execute("send_command", params)
+
             # Press download
             final_download_button.click()
 
+            # Add dataset details to csv
             with open('dataset_details.csv', 'r') as file:
                 if not any(line.startswith(f"{dataset_number},") for line in file):
-                    # Get URL of newly opened tab
-                    driver.switch_to.window(driver.window_handles[-1])
-                    download_url = driver.current_url
                     # Update the dataset details CSV with the download URL and other details
                     with open('dataset_details.csv', 'a') as file:
-                        file.write(f"{dataset_number},{page},{i},{dataset_info},{dataset_link},{download_url}\n")
+                        # Log the absolute dataset number, page, dataset index in page, dataset title, dataset link
+                        file.write(f"{dataset_number},{page},{i},{dataset_info},{dataset_link}\n")
 
             # Wait for the download to complete     
             time.sleep(5)           
