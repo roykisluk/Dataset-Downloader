@@ -10,6 +10,7 @@ import os
 from transformers import VisionEncoderDecoderModel, TrOCRProcessor
 import torch
 from PIL import Image
+from selenium.webdriver.chrome.options import Options
 
 ####################################################################################################
 ### SETUP ###
@@ -28,6 +29,9 @@ driver_path = '/Users/roykisluk/Downloads/Archive/chromedriver-mac-arm64/chromed
 ####################################################################################################
 ### OPTIONAL ###
 ####################################################################################################
+
+# Define the download folder path
+download_folder = os.path.abspath("/Volumes/SSD")
 
 # 2Captcha API key
 '''
@@ -49,16 +53,29 @@ datasets_per_page=8 # number of datasets per page
 # Define model for OCR
 processor = TrOCRProcessor.from_pretrained("anuashok/ocr-captcha-v3")
 model = VisionEncoderDecoderModel.from_pretrained("anuashok/ocr-captcha-v3")
+
+
+
 ####################################################################################################
 
 # Configure logging
 logging.basicConfig(filename='download_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
 
+# Set Chrome options
+chrome_options = Options()
+prefs = {
+    "download.default_directory": download_folder,  # Set default download directory
+    "download.prompt_for_download": False,          # Disable the download prompt
+    "safebrowsing.enabled": True                    # Enable safe browsing
+}
+chrome_options.add_experimental_option("prefs", prefs)
+
+
 # Create a Service object for the driver
 service = Service(driver_path)
 
 # Initialize WebDriver
-driver = webdriver.Chrome(service=service)
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # Function to solve CAPTCHA using 2Captcha
 def solve_captcha_twocaptcha(image_element):
@@ -98,7 +115,7 @@ def solve_captcha_twocaptcha(image_element):
 # Function to solve CAPTCHA using anuashok/ocr-captcha-v3
 def solve_captcha(image_element):
     # Load model and processor
-    image_path = "captcha.jpg"
+    image_path = "captcha.png"
     image_element.screenshot(image_path)
     # Load image
     image = Image.open(image_path).convert("RGB")
@@ -121,9 +138,11 @@ def solve_captcha(image_element):
 
 # Read the log file to get the status of each dataset
 downloaded_datasets = set()
-if os.path.exists('downloaded_datasets.txt'):
-    with open('downloaded_datasets.txt', 'r') as file:
-        downloaded_datasets = set(map(int, file.read().splitlines()))
+if os.path.exists('downloaded_datasets.csv'):
+    with open('downloaded_datasets.csv', 'r') as file:
+        content = file.read().strip()
+        if content:  # Only try to parse if file is not empty
+            downloaded_datasets = set(int(x) for x in content.split(',') if x)  # Only convert non-empty strings
 
 dataset_number = 1  # Initialize dataset number
 
@@ -138,6 +157,17 @@ try:
                 continue
             
             print("Attempt - dataset index:", dataset_number," page: ", page, " dataset: ", i)
+            # Gather information about the dataset
+            dataset_element = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, f'/html/body/div[1]/div/div/main/section[2]/div/div/div[2]/div/div[3]/div[1]/div/div[{i}]/div/div[1]/h3/a'))
+            )
+            dataset_info = dataset_element.text
+            dataset_link = dataset_element.get_attribute('href')
+            
+            # Log dataset details to CSV
+            with open('dataset_details.csv', 'a') as file:
+                file.write(f"{dataset_number},{page},{i},{dataset_info},{dataset_link}\n")
+
             # Click on the download button
             download_button = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.XPATH, f'/html/body/div[1]/div/div/main/section[2]/div/div/div[2]/div/div[3]/div[1]/div/div[{i}]/div/div[2]/div[1]/div[1]/div[1]/div[1]/a'))
@@ -168,7 +198,13 @@ try:
             captcha_element = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[4]/div/div/div/img"))
             )
-            captcha_solution = solve_captcha(captcha_element).upper()
+            try:
+                captcha_solution = solve_captcha(captcha_element).upper()
+                if not captcha_solution:
+                    raise ValueError("Empty CAPTCHA solution")
+            except Exception as e:
+                logging.error(f"CAPTCHA solution failed: {e}")
+                continue
 
             # Fill in the CAPTCHA solution
             captcha_input = driver.find_element(By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[4]/div/div/input")
@@ -183,8 +219,8 @@ try:
 
             # Log the successful download
             logging.info(f"Successfully downloaded dataset {dataset_number}")
-            with open('downloaded_datasets.txt', 'a') as file:
-                file.write(f"{dataset_number}\n")
+            with open('downloaded_datasets.csv', 'a') as file:
+                file.write(f"{dataset_number},")
             dataset_number += 1
 
             # Switch back to the original tab
@@ -206,5 +242,10 @@ try:
 
 except Exception as e:
     print(f"An error occurred: {e}")
+    # Wait for user input before closing browser
+    input("Check if downloads have finished, then enter any key to close the browser...")
 finally:
-    driver.quit()
+    try:
+        driver.quit()
+    except Exception as e:
+        logging.error(f"Error closing driver: {e}")
