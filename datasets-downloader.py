@@ -33,16 +33,6 @@ driver_path = '/Users/roykisluk/Downloads/Archive/chromedriver-mac-arm64/chromed
 # Define the download folder path
 download_folder = os.path.abspath("/Volumes/SSD")
 
-# 2Captcha API key
-'''
-# Set API key from environment variable
-api_key = os.getenv("TWOCAPTCHA_API_KEY")
-if not api_key:
-    raise ValueError("2Captcha API key not found in environment variables. Please set 'TWOCAPTCHA_API_KEY'.")
-# First time: set the 2Captcha API key in the system environment variables:  
-# os.environ["TWOCAPTCHA_API_KEY"] = ""
-'''
-
 # Target URL, first page
 link = "https://www.data.gov.in/catalog/6th-minor-irrigation-census-village-schedule-ground-water-schemes-surface-water-schemes"
 
@@ -53,8 +43,6 @@ datasets_per_page=8 # number of datasets per page
 # Define model for OCR
 processor = TrOCRProcessor.from_pretrained("anuashok/ocr-captcha-v3")
 model = VisionEncoderDecoderModel.from_pretrained("anuashok/ocr-captcha-v3")
-
-
 
 ####################################################################################################
 
@@ -70,47 +58,11 @@ prefs = {
 }
 chrome_options.add_experimental_option("prefs", prefs)
 
-
 # Create a Service object for the driver
 service = Service(driver_path)
 
 # Initialize WebDriver
 driver = webdriver.Chrome(service=service, options=chrome_options)
-
-# Function to solve CAPTCHA using 2Captcha
-def solve_captcha_twocaptcha(image_element):
-    """Solve CAPTCHA using 2Captcha service."""
-    # Save the CAPTCHA image locally
-    captcha_image_path = "captcha.png"
-    image_element.screenshot(captcha_image_path)
-    
-    # Send the CAPTCHA image to 2Captcha for solving
-    with open(captcha_image_path, 'rb') as file:
-        response = requests.post(
-            "https://2captcha.com/in.php",
-            data={"key": api_key, "method": "post", "json": 1},
-            files={"file": file}
-        )
-    
-    request_id = response.json().get("request")
-    if not request_id:
-        raise ValueError("Failed to get request ID from 2Captcha")
-    
-    
-    # Poll for the CAPTCHA solution
-    for _ in range(10):  # Retry up to 10 times
-        time.sleep(5)  # Wait for 5 seconds before retrying
-        result_response = requests.get(
-            "https://2captcha.com/res.php",
-            params={"key": api_key, "action": "get", "id": request_id, "json": 1}
-        )
-        result_data = result_response.json()
-        if result_data.get("status") == 1:
-            return result_data.get("request").upper()  # Return the solution in uppercase
-        elif result_data.get("request") != "CAPCHA_NOT_READY":
-            raise ValueError(f"2Captcha solution error: {result_data.get('request')}")
-    
-    raise TimeoutError("2Captcha timed out while solving the CAPTCHA.")
 
 # Function to solve CAPTCHA using anuashok/ocr-captcha-v3
 def solve_captcha(image_element):
@@ -133,7 +85,6 @@ def solve_captcha(image_element):
     generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
     # print(generated_text)
     return generated_text.upper()
-
 
 
 # Read the log file to get the status of each dataset
@@ -192,9 +143,6 @@ try:
                 EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[6]/button"))
             )
 
-            '''
-            # Non-robust captcha
-            '''
             captcha_element = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "/html/body/div[3]/div[1]/div/div/div/form/div/div/div[4]/div/div/div/img"))
             )
