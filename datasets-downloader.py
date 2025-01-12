@@ -95,6 +95,31 @@ if os.path.exists('downloaded_datasets.csv'):
         if content:  # Only try to parse if file is not empty
             downloaded_datasets = set(int(x) for x in content.split(',') if x)  # Only convert non-empty strings
 
+# Check for incomplete downloads and empty folders, remove them from downloaded_datasets
+for dataset_num in range(1, n_datasets):  # Check folders 1-203
+    dataset_folder = os.path.join(download_folder, str(dataset_num))
+    if os.path.exists(dataset_folder):
+        files = os.listdir(dataset_folder)
+        # Remove if folder is empty
+        if len(files) == 0 and dataset_num in downloaded_datasets:
+            downloaded_datasets.remove(dataset_num)
+            logging.info(f"Removed dataset {dataset_num} from downloaded list due to empty folder")
+        # Remove if there are incomplete downloads
+        for filename in files:
+            if filename.endswith('.crdownload'):
+                if dataset_num in downloaded_datasets:
+                    downloaded_datasets.remove(dataset_num)
+                    logging.info(f"Removed dataset {dataset_num} from downloaded list due to incomplete download")
+    # Remove if folder doesn't exist
+    elif not os.path.exists(dataset_folder) and dataset_num in downloaded_datasets:
+        downloaded_datasets.remove(dataset_num)
+        logging.info(f"Removed dataset {dataset_num} from downloaded list due to non-existent folder")
+
+# Write updated downloaded_datasets to CSV
+with open('downloaded_datasets.csv', 'w') as file:
+    file.write(','.join(str(x) for x in sorted(downloaded_datasets)) + ',')
+
+
 dataset_number = 1  # Initialize dataset number
 
 try:

@@ -27,3 +27,24 @@
 2025-01-12 19:24:14,747 - Successfully downloaded dataset 11
 2025-01-12 19:24:27,024 - Successfully downloaded dataset 12
 2025-01-12 19:24:39,141 - Successfully downloaded dataset 13
+2025-01-12 19:43:58,689 - Removed dataset 1 from downloaded list due to non-existent folder
+2025-01-12 19:43:58,691 - Removed dataset 4 from downloaded list due to incomplete download
+2025-01-12 19:43:58,691 - Removed dataset 5 from downloaded list due to incomplete download
+2025-01-12 19:43:58,691 - Removed dataset 6 from downloaded list due to non-existent folder
+2025-01-12 19:45:41,504 - Removed dataset 1 from downloaded list due to non-existent folder
+2025-01-12 19:45:41,506 - Removed dataset 4 from downloaded list due to incomplete download
+2025-01-12 19:45:41,507 - Removed dataset 5 from downloaded list due to incomplete download
+2025-01-12 19:45:41,507 - Removed dataset 6 from downloaded list due to non-existent folder
+2025-01-12 19:45:57,448 - Successfully downloaded dataset 1
+2025-01-12 19:46:09,778 - Successfully downloaded dataset 4
+2025-01-12 19:46:21,953 - Successfully downloaded dataset 5
+2025-01-12 19:46:34,246 - Successfully downloaded dataset 6
+2025-01-12 19:46:46,767 - Successfully downloaded dataset 7
+2025-01-12 19:49:22,087 - Removed dataset 4 from downloaded list due to incomplete download
+2025-01-12 19:49:22,089 - Removed dataset 5 from downloaded list due to incomplete download
+2025-01-12 19:49:22,089 - Removed dataset 6 from downloaded list due to empty folder
+2025-01-12 19:49:22,089 - Removed dataset 7 from downloaded list due to empty folder
+2025-01-12 19:49:37,434 - Successfully downloaded dataset 4
+2025-01-12 19:49:41,217 - Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ConnectionResetError(54, 'Connection reset by peer')': /session/b9aa99d51df2d68a07448dd86163d776
+2025-01-12 19:49:41,217 - Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x16570a630>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/b9aa99d51df2d68a07448dd86163d776
+2025-01-12 19:49:41,218 - Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x16575cdd0>: Failed to establish a new connection: [Errno 61] Connection refused')': /session/b9aa99d51df2d68a07448dd86163d776
