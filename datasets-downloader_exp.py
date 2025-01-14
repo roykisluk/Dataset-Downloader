@@ -16,21 +16,29 @@ from selenium.webdriver.chrome.options import Options
 ### SETUP ###
 ####################################################################################################
 
-# Install the required packages:
+####################################################################################################
+### CRITICAL ###
+####################################################################################################
+
+# Install the required packages
 # pip install requests selenium transformers torch pillow
 
 # Initialize WebDriver: download the appropriate ChromeDriver for your OS from: https://googlechromelabs.github.io/chrome-for-testing/#stable
-driver_path = r'/Users/roykisluk/Downloads/Archive/chromedriver-mac-arm64/chromedriver'  # Replace with your ChromeDriver path
+driver_path = '/Users/roykisluk/Downloads/Archive/chromedriver-mac-arm64/chromedriver'  # Replace with your ChromeDriver path
+
+####################################################################################################
+### OPTIONAL ###
+####################################################################################################
 
 # Define the download folder path
-download_folder = os.path.abspath(r"/Users/roykisluk/Downloads/Datasets/")
+download_folder = os.path.abspath("/Users/roykisluk/Downloads/Datasets/")
 
-# Target URL of the gov.in catalog
+# Target URL, first page
 link = "https://www.data.gov.in/catalog/6th-minor-irrigation-census-village-schedule-ground-water-schemes-surface-water-schemes"
 
 # Structure info
 n_datasets=203 # number of datasets
-datasets_per_page=8 # maximum number of datasets per page
+datasets_per_page=8 # number of datasets per page
 
 # Define model for OCR
 processor = TrOCRProcessor.from_pretrained("anuashok/ocr-captcha-v3")
@@ -88,7 +96,7 @@ if os.path.exists('downloaded_datasets.csv'):
             downloaded_datasets = set(int(x) for x in content.split(',') if x)  # Only convert non-empty strings
 
 # Check for incomplete downloads and empty folders, remove them from downloaded_datasets
-for dataset_num in range(1, n_datasets):  # Check folders 1 to n_datasets
+for dataset_num in range(1, n_datasets):  # Check folders 1-203
     dataset_folder = os.path.join(download_folder, str(dataset_num))
     if os.path.exists(dataset_folder):
         files = os.listdir(dataset_folder)
